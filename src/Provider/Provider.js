@@ -36,6 +36,8 @@ class Provider {
 
   #dynRegRoute = '/register'
 
+  #basePath = ''
+
   #whitelistedRoutes = []
 
   #ENCRYPTIONKEY
@@ -115,6 +117,7 @@ class Provider {
      * @param {String} [options.loginRoute = '/login'] - Lti Provider login route. If no option is set '/login' is used.
      * @param {String} [options.keysetRoute = '/keys'] - Lti Provider public jwk keyset route. If no option is set '/keys' is used.
      * @param {String} [options.dynRegRoute = '/register'] - Dynamic registration route.
+     * @param {String} [options.basePath = ''] - Base bath when behind a proxy
      * @param {Boolean} [options.https = false] - Set this as true in development if you are not using any web server to redirect to your tool (like Nginx) as https and are planning to configure ssl through Express.
      * @param {Object} [options.ssl] - SSL certificate and key if https is enabled.
      * @param {String} [options.ssl.key] - SSL key.
@@ -155,6 +158,7 @@ class Provider {
     if (options && (options.loginRoute || options.loginUrl)) this.#loginRoute = options.loginRoute || options.loginUrl
     if (options && (options.keysetRoute || options.keysetUrl)) this.#keysetRoute = options.keysetRoute || options.keysetUrl
     if (options && options.dynRegRoute) this.#dynRegRoute = options.dynRegRoute
+    if (options && options.basePath) this.#basePath = options.basePath;
 
     if (options && options.devMode === true) this.#devMode = true
     if (options && options.ltiaas === true) this.#ltiaas = true
@@ -345,7 +349,7 @@ class Provider {
             query.append('ltik', newLtik)
             const urlSearchParams = query.toString()
             provMainDebug('Redirecting to endpoint with ltik')
-            return res.redirect(req.baseUrl + req.path + '?' + urlSearchParams)
+            return res.redirect(this.#basePath + req.baseUrl + req.path + '?' + urlSearchParams)
           } else {
             const state = req.body.state
             if (state) {
